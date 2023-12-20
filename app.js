@@ -6,13 +6,13 @@ class MainScene extends Phaser.Scene {
   
     preload() {
     
-      this.load.image('logo', 'assets/enchanted-forest.jpg');
+      this.load.image('background', 'assets/enchanted-forest.jpg');
     }
   
     create() {
  
-      this.logo = this.add.image(400, 300, 'logo');
-      this.logo.setScale(1.4)
+      this.background = this.add.image(400, 300, 'background');
+      this.background.setScale(1.4)
     }
   
     update() {
@@ -22,9 +22,10 @@ class MainScene extends Phaser.Scene {
   
   const config = {
     type: Phaser.AUTO,
+    parent: 'game-container',
     width: 800,
     height: 600,
-    scene: MainScene,
+    scene: [MainScene],
   };
   
 
