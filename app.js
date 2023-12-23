@@ -1,3 +1,23 @@
+class PlayerInput {
+  constructor(scene, player) {
+    this.scene = scene;
+    this.player = player;
+    this.cursors = scene.input.keyboard.createCursorKeys();
+  }
+
+  update() {
+    if (this.cursors.left.isDown) {
+      this.player.setVelocityX(-200);
+      this.player.setScale(-0.1, 0.1); // Flip the image
+    } else if (this.cursors.right.isDown) {
+      this.player.setVelocityX(200);
+      this.player.setScale(0.1, 0.1); // Reset the scale to the original direction
+    } else {
+      this.player.setVelocityX(0);
+    }
+  }
+}
+
 class MainScene extends Phaser.Scene {
   constructor() {
     super({ key: "MainScene" });
@@ -5,7 +25,7 @@ class MainScene extends Phaser.Scene {
 
   preload() {
     this.load.image("personWithBasket", "assets/forest_fairy_9__png_overlay__by_lewis4721_dfe1plt-fullview.png");
-    this.load.image("apple", "assets/eamerla5.jpeg");
+    this.load.image("apple", "assets/eamerla.jpeg");
     this.load.image("background", "assets/enchanted-forest.jpg");
   }
 
@@ -13,7 +33,7 @@ class MainScene extends Phaser.Scene {
     this.background = this.add.image(400, 300, "background");
     this.background.setScale(1.4);
 
-    this.personWithBasket = this.physics.add.image(40, 52, "personWithBasket").setScale(.1);
+    this.personWithBasket = this.physics.add.image(40, 52, "personWithBasket").setScale(0.1);
     this.personWithBasket.setCollideWorldBounds(true);
 
     this.apples = this.physics.add.group({
@@ -30,19 +50,11 @@ class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.apples, this.apples);
     this.physics.add.collider(this.apples, this.personWithBasket, this.collectApple, null, this);
 
-    // Allow keyboard input for moving the person
-    this.cursors = this.input.keyboard.createCursorKeys();
+    this.playerInput = new PlayerInput(this, this.personWithBasket);
   }
 
   update() {
-    // Move the person left and right based on keyboard input
-    if (this.cursors.left.isDown) {
-      this.personWithBasket.setVelocityX(-200);
-    } else if (this.cursors.right.isDown) {
-      this.personWithBasket.setVelocityX(200);
-    } else {
-      this.personWithBasket.setVelocityX(0);
-    }
+    this.playerInput.update();
   }
 
   collectApple(personWithBasket, apple) {
