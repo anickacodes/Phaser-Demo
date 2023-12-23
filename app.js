@@ -7,10 +7,10 @@ class PlayerInput {
 
   update() {
     if (this.cursors.left.isDown) {
-      this.player.setVelocityX(-200);
-      this.player.setScale(-0.1, 0.1); // Flip the image
+      this.player.setVelocityX(-300);
+      this.player.setScale(-0.1, 0.1); // Flip user direction
     } else if (this.cursors.right.isDown) {
-      this.player.setVelocityX(200);
+      this.player.setVelocityX(300);
       this.player.setScale(0.1, 0.1); // Reset the scale to the original direction
     } else {
       this.player.setVelocityX(0);
@@ -59,8 +59,7 @@ class MainScene extends Phaser.Scene {
 
   collectApple(personWithBasket, apple) {
     apple.disableBody(true, true);
-    // Add your scoring logic here
-    // Increment the score or perform other actions
+    //  scoring logic here
   }
 }
 
