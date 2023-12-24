@@ -8,13 +8,68 @@ class PlayerInput {
   update() {
     if (this.cursors.left.isDown) {
       this.player.setVelocityX(-300);
-      this.player.setScale(-0.1, 0.1); // Flip user direction
+      this.player.setScale(-0.1, 0.1);
     } else if (this.cursors.right.isDown) {
       this.player.setVelocityX(300);
-      this.player.setScale(0.1, 0.1); // Reset the scale to the original direction
+      this.player.setScale(0.1, 0.1);
     } else {
       this.player.setVelocityX(0);
     }
+  }
+}
+
+class CharacterSelection extends Phaser.Scene {
+  constructor() {
+    super({ key: "CharacterSelection" });
+    this.selectedCharacterIndex = 0
+  }
+  preload() {
+    this.load.image("characterSelectionBackground", "assets/forestHut.png");
+
+    this.load.image(
+      "character1",
+      "assets/imgbin-fairy-K5AWMkUD4R8vRHWWT0RKLtAV2.png"
+    );
+    this.load.image(
+      "character2",
+      "assets/forest_fairy_9__png_overlay__by_lewis4721_dfe1plt-fullview.png"
+    );
+  }
+  create() {
+    this.background = this.add.image(400, 300, "characterSelectionBackground");
+    this.background.setScale(1.4);
+    const character1Button = this.add
+      .image(100, 300, "character1")
+      .setInteractive()
+      .setScale(0.3);
+    const character2Button = this.add
+      .image(300, 350, "character2")
+      .setInteractive()
+      .setScale(0.1);
+
+      character1Button.on("pointerup", () => this.selectCharacter(0));
+      character2Button.on("pointerup", () => this.selectCharacter(1));
+ 
+      this.input.keyboard.on("keydown-LEFT", () => this.selectCharacter(-1));
+      this.input.keyboard.on("keydown-RIGHT", () => this.selectCharacter(1));
+    }
+    selectCharacter(offset){
+      this.selectedCharacterIndex += offset
+
+      if (this.selectedCharacterIndex< 0) {
+        this.selectedCharacterIndex = 1
+      } else if (this.selectedCharacterIndex >1) {
+        this.selectedCharacterIndex = 0
+      }
+      const characterKey = `character${this.selectedCharacterIndex + 1}`;
+      this.background.setTexture(characterKey);
+      // this.background.setScale(1.4);
+    }
+  
+  startGame() {
+    const selectedCharacter = `character${this.selectedCharacterIndex + 1}`;
+    
+    this.scene.start("MainScene", { character: selectedCharacter });
   }
 }
 
@@ -24,7 +79,10 @@ class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("personWithBasket", "assets/forest_fairy_9__png_overlay__by_lewis4721_dfe1plt-fullview.png");
+    const selectedCharacter = this.registry.get("character");
+
+    this.load.image("personWithBasket", `path/to/${selectedCharacter}.png`);
+
     this.load.image("apple", "assets/eamerla.jpeg");
     this.load.image("background", "assets/enchanted-forest.jpg");
   }
@@ -33,13 +91,15 @@ class MainScene extends Phaser.Scene {
     this.background = this.add.image(400, 300, "background");
     this.background.setScale(1.4);
 
-    this.personWithBasket = this.physics.add.image(40, 52, "personWithBasket").setScale(0.1);
+    this.personWithBasket = this.physics.add
+      .image(40, 52, "personWithBasket")
+      .setScale(0.1);
     this.personWithBasket.setCollideWorldBounds(true);
 
     this.apples = this.physics.add.group({
       key: "apple",
       repeat: 9,
-      setXY: { x: 12, y: 0, stepX: 70 }
+      setXY: { x: 12, y: 0, stepX: 70 },
     });
 
     this.apples.children.iterate((apple) => {
@@ -48,7 +108,13 @@ class MainScene extends Phaser.Scene {
     });
 
     this.physics.add.collider(this.apples, this.apples);
-    this.physics.add.collider(this.apples, this.personWithBasket, this.collectApple, null, this);
+    this.physics.add.collider(
+      this.apples,
+      this.personWithBasket,
+      this.collectApple,
+      null,
+      this
+    );
 
     this.playerInput = new PlayerInput(this, this.personWithBasket);
   }
@@ -68,21 +134,21 @@ const config = {
   parent: "game-container",
   width: 800,
   height: 600,
-  scene: [MainScene],
+  scene: [CharacterSelection, MainScene],
   physics: {
     default: "arcade",
     arcade: {
       gravity: { y: 300 },
-      debug: false
-    }
+      debug: false,
+    },
   },
   title: "Apple Pickin",
   banner: {
     text: "#ffffff",
     background: ["#fff200", "#38f0e8", "#00bff3", "#ec008c"],
-    hidePhaser: true
+    hidePhaser: true,
   },
-  version: "0.0.3g"
+  version: "0.0.3g",
 };
 
 const game = new Phaser.Game(config);
