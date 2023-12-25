@@ -21,11 +21,12 @@ class PlayerInput {
 class CharacterSelection extends Phaser.Scene {
   constructor() {
     super({ key: "CharacterSelection" });
-    this.selectedCharacterIndex = 0
+    this.selectedCharacterIndex = 0;
   }
   preload() {
     this.load.image("characterSelectionBackground", "assets/forestHut.png");
-
+    this.load.image("fairyCSBackground", "assets/fairyonflowersblue.png");
+    this.load.image("leftArrow", "assets/556_arrowright.png");
     this.load.image(
       "character1",
       "assets/imgbin-fairy-K5AWMkUD4R8vRHWWT0RKLtAV2.png"
@@ -34,41 +35,70 @@ class CharacterSelection extends Phaser.Scene {
       "character2",
       "assets/forest_fairy_9__png_overlay__by_lewis4721_dfe1plt-fullview.png"
     );
+    this.load.image(
+      "startButton",
+      "assets/jungle-play-or-start-button-with-stone-and-leaves-vector-43177304.png"
+    );
   }
   create() {
     this.background = this.add.image(400, 300, "characterSelectionBackground");
-    this.background.setScale(1.4);
+    this.background.setScale(2);
+
+    const fairybackground = this.add.image(700, 400, "fairyCSBackground");
+    // fairybackground.setScale(.3);
+
+    const leftArrow = this.add
+      .image(50, 300, "leftArrow")
+      .setInteractive()
+      .setScale(0.2);
+    const rightArrow = this.add
+      .image(750, 300, "rightArrow")
+      .setInteractive()
+      .setScale(0.2);
+
+    leftArrow.on("pointerup", () => this.selectCharacter(-1));
+    rightArrow.on("pointerup", () => this.selectCharacter(1));
+
+    this.input.keyboard.on("keydown-LEFT", () => this.selectCharacter(-1));
+    this.input.keyboard.on("keydown-RIGHT", () => this.selectCharacter(1));
+
     const character1Button = this.add
       .image(100, 300, "character1")
       .setInteractive()
-      .setScale(0.3);
+      .setScale(0.4);
     const character2Button = this.add
       .image(300, 350, "character2")
       .setInteractive()
       .setScale(0.1);
 
-      character1Button.on("pointerup", () => this.selectCharacter(0));
-      character2Button.on("pointerup", () => this.selectCharacter(1));
- 
-      this.input.keyboard.on("keydown-LEFT", () => this.selectCharacter(-1));
-      this.input.keyboard.on("keydown-RIGHT", () => this.selectCharacter(1));
-    }
-    selectCharacter(offset){
-      this.selectedCharacterIndex += offset
+    character1Button.on("pointerup", () => this.selectCharacter(0));
+    character2Button.on("pointerup", () => this.selectCharacter(1));
 
-      if (this.selectedCharacterIndex< 0) {
-        this.selectedCharacterIndex = 1
-      } else if (this.selectedCharacterIndex >1) {
-        this.selectedCharacterIndex = 0
-      }
-      const characterKey = `character${this.selectedCharacterIndex + 1}`;
-      this.background.setTexture(characterKey);
-      // this.background.setScale(1.4);
+    this.input.keyboard.on("keydown-LEFT", () => this.selectCharacter(-1));
+    this.input.keyboard.on("keydown-RIGHT", () => this.selectCharacter(1));
+  }
+  selectCharacter(offset) {
+    this.selectedCharacterIndex += offset;
+
+    if (this.selectedCharacterIndex < 0) {
+      this.selectedCharacterIndex = 1;
+    } else if (this.selectedCharacterIndex > 1) {
+      this.selectedCharacterIndex = 0;
     }
-  
+    const characterKey = `character${this.selectedCharacterIndex + 1}`;
+    this.background.setTexture(characterKey);
+    this.background.setScale(0.2);
+
+    const startButton = this.add
+      .image(400, 500, "startButton")
+      .setInteractive()
+      .setScale(0.2);
+    startButton.on("pointerup", () => this.startGame());
+  }
+
   startGame() {
     const selectedCharacter = `character${this.selectedCharacterIndex + 1}`;
-    
+
     this.scene.start("MainScene", { character: selectedCharacter });
   }
 }
